@@ -64,9 +64,11 @@ This is particularly nice if you're mapping a bunch of keys that use
 Type Mapping
 ------------
 
-So we can do name-mapping, but what about type-mapping? JSON doesn't support
-timestamps unless they're stored as numbers or formatted strings, but that's
-not very nice in Python, where we have (slightly) nicer ``datetime`` objects.
+So we can do name-mapping, but what about type-mapping? For example, JSON
+doesn't support timestamps unless they're stored as numbers or formatted
+strings, but that's not very nice in Python, where we have (slightly) nicer
+``datetime`` objects.
+
 Can Kylie do the mapping for you? You bet! You'll need a function that converts
 from the serialized form to the Python type, and another that does the reverse
 mapping though. Let's define those::
@@ -82,22 +84,24 @@ mapping though. Let's define those::
         epoch = datetime.utcfromtimestamp(0)
         return epoch + timedelta(seconds=millis / 1000.0)
 
-And now we create an ``Attribute`` using the ```` and ```` parameters::
+And now we create an ``Attribute`` using the ``python_type`` and
+``serialized_type`` parameters::
 
     class Animal(Model):
         animal_id = Attribute('id')
         name = Attribute()
         birth_date = Attribute(python_type=milliseconds_to_dt,
-                              serialized_type=dt_to_milliseconds)
+                               serialized_type=dt_to_milliseconds)
 
 
 Now you can do the following::
 
-    >> daisy_pig = Animal().deserialize({
+    >>> daisy_pig = Animal().deserialize({
         'id': 1234, 'name': 'Daisy', 'birth_date': 1428870071656
     })
-    >> daisy_pig.birth_date
+    >>> daisy_pig.birth_date
     datetime.datetime(2015, 4, 12, 20, 21, 11, 656000)
+
 
 
 Nested Models
