@@ -95,4 +95,6 @@ Why is it called Kylie?
 I named it `especially for you`_. Back in the late 80's (I'm old!) Kylie and
 Jason were today's Kim and Kanye. **This** Kylie works well with JSON. Geddit?
 
+.. image:: http://upload.wikimedia.org/wikipedia/en/1/1a/KylieEspeciallyForYouCover.png
+
 .. _especially for you: http://en.wikipedia.org/wiki/Especially_for_You
