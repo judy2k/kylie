@@ -124,8 +124,6 @@ class MetaModel(type):
         # Store the list of Attributes on the class:
         cls._model_attributes = model_attributes
 
-        print("Initialized %s" % name)
-
 
 class Model(with_metaclass(MetaModel, object)):
     """
