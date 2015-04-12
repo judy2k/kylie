@@ -8,6 +8,6 @@ __all__ = ['Attribute', 'Relation', 'Model']
 
 __author__ = 'Mark Smith'
 __email__ = 'mark.smith@practicalpoetry.co.uk'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 from .kylie import Attribute, Relation, Model

@@ -23,7 +23,7 @@ test_requirements = [
 
 setup(
     name='kylie',
-    version='0.1.0',
+    version='0.1.1',
     description="Kylie provides mappings between JSON data structures and Python objects.",
     long_description=readme + '\n\n' + history,
     author="Mark Smith",
