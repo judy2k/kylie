@@ -68,3 +68,12 @@ dist: clean
 
 install: clean
 	python setup.py install
+
+bump-patch:
+	bumpversion patch
+
+bump-minor:
+	bumpversion minor
+
+bump-major:
+	bumpversion major
