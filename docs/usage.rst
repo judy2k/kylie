@@ -97,8 +97,8 @@ And now we create an ``Attribute`` using the ``python_type`` and
 Now you can do the following::
 
     >>> daisy_pig = Animal().deserialize({
-        'id': 1234, 'name': 'Daisy', 'birth_date': 1428870071656
-    })
+    ...     'id': 1234, 'name': 'Daisy', 'birth_date': 1428870071656
+    ... })
     >>> daisy_pig.birth_date
     datetime.datetime(2015, 4, 12, 20, 21, 11, 656000)
 
@@ -119,11 +119,11 @@ If person drive cars, you can define the following::
 The following will now work::
 
     >>> maggie = Person().deserialize({
-        'name': 'Margaret',
-        'car': {
-            'color': 'red'
-        }
-    })
+    ...     'name': 'Margaret',
+    ...     'car': {
+    ...         'color': 'red'
+    ...     }
+    ... })
 
     >>> maggie.car
     <__main__.Car instance as #123455>
@@ -139,8 +139,8 @@ If a value in the input dict is ``None``, it will be set to ``None`` in the
 deserialized object. There's no way to ensure a value is non-None.
 
 If an attribute is missing from the input dict, ``deserialize`` will fail with
- an exception. There is currently no way to flag an attribute as 'possibly
- missing'. It's on the list.
+an exception. There is currently no way to flag an attribute as 'possibly
+missing'. It's on the list.
 
 Currently, Kylie doesn't do any validation of anything. If you get an exception
 that seems like a bad fit, please raise an issue on GitHub.
