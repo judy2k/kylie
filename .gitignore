@@ -1,0 +1,37 @@
+
+# C extensions
+# Complexity
+# Installer logs
+# Mr Developer
+# Packages
+# Sphinx
+# Translations
+# Unit test / coverage reports
+*.egg
+*.egg-info
+*.mo
+*.py[cod]
+*.so
+.coverage
+.installed.cfg
+.mr.developer.cfg
+.project
+.pydevproject
+.tox
+bin
+build
+develop-eggs
+dist
+docs/_build
+eggs
+htmlcov
+lib
+lib64
+nosetests.xml
+output/*.html
+output/*/index.html
+parts
+pip-log.txt
+sdist
+var
+venv3
