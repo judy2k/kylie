@@ -34,6 +34,7 @@ class BobModel(Model):
                              serialized_type=complex_pack)
     spanish_inquisition = Relation(
         SpanishInquisitionModel, 'spanishInquisition')
+    null = Attribute()
 
 
 class TestDeserialization(unittest.TestCase):
@@ -48,7 +49,8 @@ class TestDeserialization(unittest.TestCase):
             'complex_type': {
                 'real': 2,
                 'imaginary': 1,
-            }
+            },
+            'null': None,
         }
         self.bob = BobModel().deserialize(self.data)
 
@@ -66,6 +68,9 @@ class TestDeserialization(unittest.TestCase):
 
     def test_custom_unpack(self):
         self.assertEqual(self.bob.complex_type, complex(2, 1))
+
+    def test_null_value(self):
+        self.assertEqual(self.bob.null, None)
 
 
 class TestConstruction(unittest.TestCase):
@@ -117,6 +122,9 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(self.data['complex_type'], {
             'real': 4, 'imaginary': 7,
         })
+
+    def test_null_value(self):
+        self.assertEqual(self.data['null'], None)
 
 
 if __name__ == '__main__':
