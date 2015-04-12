@@ -4,9 +4,6 @@ Installation
 
 At the command line::
 
-    $ easy_install kylie
+    $ pip kylie
 
-Or, if you have virtualenvwrapper installed::
-
-    $ mkvirtualenv kylie
-    $ pip install kylie
+Kylie is 100% Python and has no dependencies, so it should be nice and easy.
