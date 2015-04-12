@@ -12,6 +12,7 @@ Contents:
    contributing
    authors
    history
+   kylie
 
 Indices and tables
 ==================
