@@ -73,7 +73,7 @@ So what doesn't Kylie do yet? Well, there are quite a few things, because it's
 very new:
 
 * Can't currently map to lists of nested objects (well, you can, but you have
-  write the attribute mapper functions yourself.
+  write the attribute mapper functions yourself).
 * Doesn't have any mechanism for validation. I am planning to add this, once I
   decide the best way to do it. *Ideas welcome!*
 * Doesn't have any built-in mechanism for choosing between different types to
