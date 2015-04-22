@@ -30,6 +30,8 @@ Example
         inquisition_id = Attribute('id')
         expected = Attribute(python_type=bool, serialized_type=int)
 
+Then::
+
     >>> surprise = SpanishInquisitionModel(inquisition_id=1234, expected=False)
     >>> surprise.inquisition_id
     1234
@@ -42,23 +44,21 @@ expected is mapped to ``0`` instead of ``False``.
 We can now take this dict, ``dumps`` it to JSON, and somewhere else call
 the following on the json_data (which is a dict returned from ``loads``)::
 
-    >>> my_surprise = SpanishInquisitionModel().deserialize(json_data)
+    >>> my_surprise = SpanishInquisitionModel.deserialize(json_data)
     >>> my_surprise.inquisition_id
     1234
     >>> my_surprise.expected
     False
 
-Kylie also supports nested models, so you can embed other Model instances
+Kylie also supports :ref:`nested models`, so you can embed other Model instances
 inside the data, and Kylie will manage serialization and deserialization of
-them for you. See the docs_ for details.
-
-.. _docs: https://kylie.readthedocs.org/
+them for you.
 
 
 Features
 --------
 
-* Allows properties to have different names between Models and python dictionary keys.
+* Allows :ref:`name mapping` between Models and python dictionary keys.
 * Allows type conversion when serializing and de-serializing objects.
 * Automatic serialization/deserialization of attributes that are also Models.
 * Not bound to JSON in any way, and should also be useful for MessagePack_
@@ -69,11 +69,9 @@ Features
 Non-Features
 ------------
 
-So what doesn't Kylie do yet? Well, there are quite a few things, because it's
+So what doesn't Kylie do yet? Well, there are a few things, because it's
 very new:
 
-* Can't currently map to lists of nested objects (well, you can, but you have
-  write the attribute mapper functions yourself).
 * Doesn't have any mechanism for validation. I am planning to add this, once I
   decide the best way to do it. *Ideas welcome!*
 * Doesn't have any built-in mechanism for choosing between different types to

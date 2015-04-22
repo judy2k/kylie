@@ -26,6 +26,10 @@ class SpanishInquisitionModel(Model):
     expected = Attribute(python_type=bool, serialized_type=int)
 
 
+class PersonModel(Model):
+    name = Attribute()
+
+
 class BobModel(Model):
     bob_id = Attribute("id")
     entry_fee = Attribute()
@@ -35,6 +39,7 @@ class BobModel(Model):
     spanish_inquisition = Relation(
         SpanishInquisitionModel, 'spanishInquisition')
     null = Attribute()
+    people = Relation(PersonModel, sequence=True)
 
 
 class TestDeserialization(unittest.TestCase):
@@ -50,9 +55,17 @@ class TestDeserialization(unittest.TestCase):
                 'real': 2,
                 'imaginary': 1,
             },
+            'people': [
+                {
+                    'name': 'Alice'
+                },
+                {
+                    'name': 'Sue'
+                }
+            ],
             'null': None,
         }
-        self.bob = BobModel().deserialize(self.data)
+        self.bob = BobModel.deserialize(self.data)
 
     def test_attr_mapping(self):
         self.assertEqual(self.bob.bob_id, 123456)
@@ -98,7 +111,11 @@ class TestSerialization(unittest.TestCase):
             entry_fee=7,
             is_happy=True,
             spanish_inquisition=inquisition,
-            complex_type=complex(4, 7)
+            complex_type=complex(4, 7),
+            people=[
+                PersonModel(name='Alice'),
+                PersonModel(name='Sue'),
+            ]
         )
 
         self.data = bob.serialize()
