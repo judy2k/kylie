@@ -17,7 +17,7 @@ instances::
 If you have a dictionary of JSON types, you can deserialize it into an `Animal`
 instance as follows::
 
-    daisy_pig = Animal().deserialize({
+    daisy_pig = Animal.deserialize({
         'id': 1234,
         'name': 'Daisy',
     })
@@ -44,6 +44,8 @@ You can then call ``serialize`` on this to return a dict containing the
 object's data.
 
 *But that's not very interesting*, so let's see what else we can do.
+
+.. _name mapping:
 
 Name Mapping
 ------------
@@ -96,7 +98,7 @@ And now we create an ``Attribute`` using the ``python_type`` and
 
 Now you can do the following::
 
-    >>> daisy_pig = Animal().deserialize({
+    >>> daisy_pig = Animal.deserialize({
     ...     'id': 1234, 'name': 'Daisy', 'birth_date': 1428870071656
     ... })
     >>> daisy_pig.birth_date
@@ -104,10 +106,12 @@ Now you can do the following::
 
 
 
+.. _nested models:
+
 Nested Models
 -------------
 
-If person drive cars, you can define the following::
+If a person drives a car, you can define the following::
 
     class Car(Model):
         color = Attribute()
@@ -118,7 +122,7 @@ If person drive cars, you can define the following::
 
 The following will now work::
 
-    >>> maggie = Person().deserialize({
+    >>> maggie = Person.deserialize({
     ...     'name': 'Margaret',
     ...     'car': {
     ...         'color': 'red'
@@ -130,6 +134,34 @@ The following will now work::
 
     >>> maggie.car.color
     'red'
+
+
+Nested Sequences
+----------------
+
+If a car has multiple wheels, you can store them in an embedded sequence::
+
+    class Wheel(Model):
+        front = Attribute()
+        side = Attribute()
+
+    class Car(Model):
+        wheels = Relation(Wheel, sequence=True)
+
+Now you can store and lists of Wheels with your car::
+
+    >>> reliant_robin = Car.deserialize({
+    ...     'wheels': [
+    ...         dict(front=True, side='Middle'),
+    ...         dict(front=False, side='Left'),
+    ...         dict(front=False, side='Right'),
+    ...     ]
+    ... })
+
+    >>> reliant_robin.wheels
+    [<__main__.Wheel at 0x10306bdd0>,
+     <__main__.Wheel at 0x10306ba50>,
+     <__main__.Wheel at 0x10306bb90>]
 
 
 What else should I know?

@@ -9,10 +9,11 @@ Contents:
    readme
    installation
    usage
+   kylie
    contributing
    authors
    history
-   kylie
+
 
 Indices and tables
 ==================
