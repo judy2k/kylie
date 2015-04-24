@@ -5,6 +5,9 @@ Kylie
 .. image:: https://img.shields.io/travis/judy2k/kylie.svg
         :target: https://travis-ci.org/judy2k/kylie
 
+.. image:: https://coveralls.io/repos/judy2k/kylie/badge.svg?branch=master
+        :target: https://coveralls.io/r/judy2k/kylie?branch=master
+
 .. image:: https://img.shields.io/pypi/v/kylie.svg
         :target: https://pypi.python.org/pypi/kylie
 
