@@ -138,7 +138,13 @@ class Relation(Attribute):
 
 class MetaModel(type):
 
-    """A metaclass to complete initialization of Attributes defined on a Model."""
+    """A metaclass to complete initialization of Attributes defined on a Model.
+
+    On initialization, MetaModel iterates through any ``Attribute``s assigned
+    to the Model class and sets their ``attr_name`` attribute, so they know
+    how they are defined on the Model. This information is required for
+    serialization and deserialization.
+    """
 
     def __init__(cls, name, bases, cls_dict):
         super(MetaModel, cls).__init__(name, bases, cls_dict)
@@ -160,7 +166,7 @@ class MetaModel(type):
 
 class Model(with_metaclass(MetaModel, object)):
 
-    """A parent class that provides the ability to map to and from JSON data structures."""
+    """A parent class that can map to and from JSON-style data structures."""
 
     _model_attributes = None
 

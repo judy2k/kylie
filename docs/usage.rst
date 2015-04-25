@@ -63,6 +63,8 @@ attribute called ``animal_id`` instead of ``id``. Result!
 This is particularly nice if you're mapping a bunch of keys that use
 *javaNamingConvention* to *python_naming_convention*.
 
+.. _type conversion:
+
 Type Mapping
 ------------
 
@@ -163,6 +165,10 @@ Now you can store and lists of Wheels with your car::
      <__main__.Wheel at 0x10306ba50>,
      <__main__.Wheel at 0x10306bb90>]
 
+
+<sup>*</sup> The `Reliant Robin`_ was a 3-wheeled car.
+
+.. _Reliant Robin: http://en.wikipedia.org/wiki/Reliant_Robin
 
 What else should I know?
 ------------------------
