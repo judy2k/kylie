@@ -58,7 +58,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Kylie Models'
+project = u'Kylie'
 copyright = u'2015, Mark Smith'
 
 # The version info for the project you're documenting, acts as replacement
@@ -212,7 +212,7 @@ latex_elements = {
 # [howto/manual]).
 latex_documents = [
     ('index', 'kylie.tex',
-     u'Kylie Models Documentation',
+     u'Kylie Documentation',
      u'Mark Smith', 'manual'),
 ]
 
@@ -243,7 +243,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'kylie',
-     u'Kylie Models Documentation',
+     u'Kylie Documentation',
      [u'Mark Smith'], 1)
 ]
 
@@ -258,7 +258,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'kylie',
-     u'Kylie Models Documentation',
+     u'Kylie Documentation',
      u'Mark Smith',
      'kylie',
      'One line description of project.',
