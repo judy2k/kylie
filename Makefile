@@ -50,9 +50,9 @@ coverage:
 	open htmlcov/index.html
 
 docs:
-	# rm -f docs/kylie.rst
-	# rm -f docs/modules.rst
-	# sphinx-apidoc -o docs/ kylie
+	# rm -f docs/kylie.rst          # Doesn't need regeneration
+	# rm -f docs/modules.rst        # Not needed unless we create submodules
+	# sphinx-apidoc -o docs/ kylie  # Doesn't need regeneration
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
