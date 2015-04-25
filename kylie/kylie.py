@@ -2,8 +2,7 @@
 
 """Internal implementation of the `kylie` package.
 
-You probably want to use the `kylie` package directly, instead of this on, as
-that is the public interface.
+You probably want to use the `kylie` package directly, instead of this.
 """
 
 from __future__ import print_function
@@ -108,7 +107,8 @@ class Relation(Attribute):
 
     def __init__(self, relation_class, struct_name=None, sequence=False):
         super(Relation, self).__init__(struct_name=struct_name)
-        self.relation_class = relation_class
+        # TODO: Rename relation_class and class_chooser
+        self.class_chooser = relation_class
         self.sequence = sequence
 
     def unpack(self, instance, element):
@@ -117,12 +117,13 @@ class Relation(Attribute):
         Create a new instance of the `relation_class` and deserialize the
         provided element into it.
         """
+        # TODO: Rename element
         if self.sequence:
             unpacked = [
-                self.relation_class.deserialize(item) for item in element
+                self.class_chooser.deserialize(item) for item in element
             ]
         else:
-            unpacked = self.relation_class.deserialize(element)
+            unpacked = self.class_chooser.deserialize(element)
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, d):
@@ -134,6 +135,37 @@ class Relation(Attribute):
             ]
         else:
             d[self.struct_name] = getattr(instance, self.attr_name).serialize()
+
+
+class BaseModelSwitcher(object):
+    def choose_model(self, element):
+        """
+        Return a Model class suitable for deserializing the given `element`.
+        Params:
+            element: A data item.
+
+        Return: An object (or class, usually a Model) with a deserialize method
+            that can deserialize the given `element`
+        """
+
+    def deserialize(self, element):
+        return self.choose_model(element).deserialize(element)
+
+
+class DeserializationError(Exception):
+    pass
+
+
+class AttributeSwitcher(BaseModelSwitcher):
+    def __init__(self, type_map, attribute_name='__type__'):
+        self.type_map = type_map
+        self.attribute_name = attribute_name
+
+    def choose_model(self, element):
+        if self.attribute_name in element:
+            return element.get(self.attribute_name)
+        else:
+            raise DeserializationError("Missing {attr_name} key in ")
 
 
 class MetaModel(type):
