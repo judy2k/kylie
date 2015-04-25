@@ -42,7 +42,7 @@ Example
 
 Then:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> surprise = SpanishInquisitionModel(inquisition_id=1234, expected=False)
     >>> surprise.inquisition_id
@@ -56,7 +56,7 @@ expected is mapped to ``0`` instead of ``False``.
 We can now take this dict, ``dumps`` it to JSON, and somewhere else call
 the following on the json_data (which is a dict returned from ``loads``):
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> my_surprise = SpanishInquisitionModel.deserialize(json_data)
     >>> my_surprise.inquisition_id
