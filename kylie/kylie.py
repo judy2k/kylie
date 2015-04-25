@@ -165,15 +165,13 @@ class Model(with_metaclass(MetaModel, object)):
     _model_attributes = None
 
     def __init__(self, *args, **kwargs):
-        cls = self.__class__
-
         if args:
             # Ordering of attributes is not guaranteed, so we can't use
             # positional params:
             raise TypeError("Model does not support positional parameters")
 
         # Set everything to None:
-        for attr in cls._model_attributes:
+        for attr in self._model_attributes:
             setattr(self, attr.attr_name, None)
 
         # Set named params:
@@ -190,8 +188,7 @@ class Model(with_metaclass(MetaModel, object)):
 
     def serialize(self):
         """Extract this model's Attributes into a dict."""
-        cls = self.__class__
         d = {}
-        for attr in cls._model_attributes:
+        for attr in self._model_attributes:
             attr.pack(self, d)
         return d
