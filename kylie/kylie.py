@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-kylie.kylie - Internal implementation of the `kylie` package.
+"""Internal implementation of the `kylie` package.
 
 You probably want to use the `kylie` package directly, instead of this on, as
 that is the public interface.
@@ -11,30 +10,32 @@ from __future__ import print_function
 
 
 def with_metaclass(meta, *bases):
-    """
-    Create a base class with a metaclass.
-    """
-
+    """Create a base class with a metaclass."""
     # This function was pasted from the `six` library.
     #
     # This requires a bit of explanation: the basic idea is to make a dummy
     # metaclass for one level of class instantiation that replaces itself with
     # the actual metaclass.
     class MetaClass(meta):
-        """ Indirection for the provided metaclass. """
+
+        """Indirection for the provided metaclass."""
+
         def __new__(cls, name, this_bases, d):
             return meta(name, bases, d)
+
     return type.__new__(MetaClass, 'temporary_class', (), {})
 
 
 def identity(d):
-    """
-    The identity function, because functional programmers hate `if` statements.
+    """The identity function.
+
+    Because functional programmers hate `if` statements.
     """
     return d
 
 
 class Attribute(object):
+
     """Used to define a persistent attribute on a Model subclass.
 
     Args:
@@ -66,15 +67,11 @@ class Attribute(object):
             serialized_type if serialized_type else identity
 
     def unpack(self, instance, element):
-        """
-        Unpack the data item, provided as element, and store on the instance.
-        """
+        """Unpack the data item and store on the instance."""
         setattr(instance, self.attr_name, self.python_type_converter(element))
 
     def pack(self, instance, d):
-        """
-        Store the attribute on the provided dictionary, `d`.
-        """
+        """Store the attribute on the provided dictionary, `d`."""
         attr_value = getattr(instance, self.attr_name)
         d[self.struct_name] = self.serialized_type_converter(attr_value)
 
@@ -98,15 +95,15 @@ class Relation(Attribute):
 
     """An Attribute that embeds to another Model.
 
-        Args:
-            relation_class (Model): The Model subclass that will be
-                deserialized into this attribute.
-            struct_name (str, optional): The name of the key that will be used
-                when serializing this attribute into a dict. Defaults to the
-                name of the attribute on the host Model.
-            sequence (bool, optional): Indicates that this attribute will store
-                a sequence of ``relation_class``, which will be serialized to a
-                list.
+    Args:
+        relation_class (Model): The Model subclass that will be
+            deserialized into this attribute.
+        struct_name (str, optional): The name of the key that will be used
+            when serializing this attribute into a dict. Defaults to the
+            name of the attribute on the host Model.
+        sequence (bool, optional): Indicates that this attribute will store
+            a sequence of ``relation_class``, which will be serialized to a
+            list.
     """
 
     def __init__(self, relation_class, struct_name=None, sequence=False):
@@ -115,7 +112,8 @@ class Relation(Attribute):
         self.sequence = sequence
 
     def unpack(self, instance, element):
-        """
+        """Unpack an embedded, serialized Model.
+
         Create a new instance of the `relation_class` and deserialize the
         provided element into it.
         """
@@ -128,9 +126,7 @@ class Relation(Attribute):
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, d):
-        """
-        Serialize the provided `instance` and store in the provided dict `d`.
-        """
+        """Serialize the provided `instance` into the provided dict `d`."""
         if self.sequence:
             model_seq = getattr(instance, self.attr_name)
             d[self.struct_name] = [
@@ -141,9 +137,8 @@ class Relation(Attribute):
 
 
 class MetaModel(type):
-    """
-    A metaclass to complete initialization of Attributes defined on a Model.
-    """
+
+    """A metaclass to complete initialization of Attributes defined on a Model."""
 
     def __init__(cls, name, bases, cls_dict):
         super(MetaModel, cls).__init__(name, bases, cls_dict)
@@ -164,10 +159,8 @@ class MetaModel(type):
 
 
 class Model(with_metaclass(MetaModel, object)):
-    """
-    A parent class that provides the ability to map to and from JSON
-    data structures.
-    """
+
+    """A parent class that provides the ability to map to and from JSON data structures."""
 
     _model_attributes = None
 
@@ -189,18 +182,14 @@ class Model(with_metaclass(MetaModel, object)):
 
     @classmethod
     def deserialize(cls, d):
-        """
-        Extract the data stored in the dict `d` into this Model instance.
-        """
+        """Extract the data from a dict into this Model instance."""
         result = cls()
         for attr in cls._model_attributes:
             attr.unpack(result, d[attr.struct_name])
         return result
 
     def serialize(self):
-        """
-        Extract this model's Attributes into a dict.
-        """
+        """Extract this model's Attributes into a dict."""
         cls = self.__class__
         d = {}
         for attr in cls._model_attributes:
