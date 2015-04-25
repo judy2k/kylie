@@ -197,4 +197,8 @@ class Model(with_metaclass(MetaModel, object)):
         d = {}
         for attr in self._model_attributes:
             attr.pack(self, d)
+
+        if hasattr(self, 'post_serialize'):
+            self.post_serialize(d)
+
         return d

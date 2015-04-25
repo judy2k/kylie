@@ -42,7 +42,7 @@ class BobModel(Model):
     people = Relation(PersonModel, sequence=True)
 
 
-class TestDeserialization(unittest.TestCase):
+class DeserializationTestCase(unittest.TestCase):
     def setUp(self):
         self.data = {
             'id': 123456,
@@ -86,7 +86,7 @@ class TestDeserialization(unittest.TestCase):
         self.assertEqual(self.bob.null, None)
 
 
-class TestConstruction(unittest.TestCase):
+class ConstructionTestCase(unittest.TestCase):
     def test_empty_init(self):
         inquisition = SpanishInquisitionModel()
         self.assertEqual(inquisition.inquisition_id, None)
@@ -102,7 +102,7 @@ class TestConstruction(unittest.TestCase):
         self.assertEqual(inquisition.expected, False)
 
 
-class TestSerialization(unittest.TestCase):
+class SerializationTestCase(unittest.TestCase):
     def setUp(self):
         inquisition = SpanishInquisitionModel(
             inquisition_id=10, expected=False)
@@ -143,6 +143,39 @@ class TestSerialization(unittest.TestCase):
     def test_null_value(self):
         self.assertEqual(self.data['null'], None)
 
+
+class OverwriteModel(Model):
+    item = Attribute()
+
+    def post_serialize(self, d):
+        d['item'] = 'overwritten'
+
+
+class PostSerializeTestCase(unittest.TestCase):
+    def test_post_serialize(self):
+        overwrite = OverwriteModel(item='item')
+        d = overwrite.serialize()
+        self.assertEqual(d['item'],  'overwritten')
+
+
+class TypedModel(Model):
+    model_type = None
+
+    def post_serialize(self, d):
+        d['__type__'] = self.model_type
+
+
+class Cow(TypedModel):
+    model_type = 'cow'
+
+
+class Dog(TypedModel):
+    model_type = 'dog'
+
+
+class TypeSwitcherTestCase(unittest.TestCase):
+    def test_basic_type_switching(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
