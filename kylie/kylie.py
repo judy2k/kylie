@@ -62,9 +62,7 @@ class Attribute(object):
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
 
-    def _apply_model(self, attr_name, model_class):
-        # Currently not storing model_class, but may need for complex
-        # multi-attribute serialization/deserialization.
+    def apply_model(self, attr_name):
         self.attr_name = attr_name
 
     def unpack(self, instance, element):
@@ -140,11 +138,11 @@ class MetaModel(type):
 
         # Gather and configure all Attributes defined on the Model class:
         model_attributes = []
-        for attr_name, attr_value in cls_dict.items():
-            if isinstance(attr_value, Attribute):
-                attr_value._apply_model(attr_name, cls)
+        for attr_name, attr_instance in cls_dict.items():
+            if isinstance(attr_instance, Attribute):
+                attr_instance.apply_model(attr_name)
 
-                model_attributes.append(attr_value)
+                model_attributes.append(attr_instance)
         # Remove the Attributes from the class to avoid accidental fallbacks
         # to the Attribute definition:
         for attr in model_attributes:
