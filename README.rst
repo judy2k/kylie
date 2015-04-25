@@ -20,12 +20,15 @@ Kylie provides mappings between JSON data structures and Python objects. It
 provides a reasonable amount of power with only a tiny bit of magic, and it has
 100% code coverage.
 
+Features
+--------
+
 * Free software: BSD license
 * Documentation: https://kylie.readthedocs.org/
-
-It supports name and type-mapping, and it's not bound to JSON, although it is
-geared to serializing and de-serializing data to and from JSON-type data
-structures such as dicts, lists, strings, numbers, and bools.
+* Allows `name mapping`_ between Models and python dictionary keys.
+* Allows `type conversion`_ when serializing and de-serializing objects.
+* Automatic serialization/deserialization of `nested models`_.
+* Not bound to JSON in any way, and should also be useful for MessagePack_
 
 
 Example
@@ -57,20 +60,9 @@ the following on the json_data (which is a dict returned from ``loads``)::
     >>> my_surprise.expected
     False
 
-Kylie also supports :ref:`nested models`, so you can embed other Model instances
-inside the data, and Kylie will manage serialization and deserialization of
-them for you.
-
-
-Features
---------
-
-* Allows :ref:`name mapping` between Models and python dictionary keys.
-* Allows type conversion when serializing and de-serializing objects.
-* Automatic serialization/deserialization of attributes that are also Models.
-* Not bound to JSON in any way, and should also be useful for MessagePack_
-
-.. _MessagePack: http://msgpack.org/
+Kylie supports `nested models`_, so you can embed
+other Model instances inside the data, and Kylie will manage serialization and
+deserialization of them for you.
 
 
 Non-Features
@@ -79,10 +71,10 @@ Non-Features
 So what doesn't Kylie do yet? Well, there are a few things, because it's
 very new:
 
-* Doesn't have any mechanism for validation. I am planning to add this, once I
+* Doesn't have any mechanism for validation. I plan to add this once I
   decide the best way to do it. *Ideas welcome!*
 * Doesn't have any built-in mechanism for choosing between different types to
-  deserialize a dict to. Again, you can do this through customized type mapper
+  deserialize a dict to. This can be done through customized type mapper
   functions. At the very least, I'll document this soon. I plan to add the
   ability to automatically deserialize to a type based on, for example, a
   ``__type__`` item in the dict.
@@ -90,16 +82,18 @@ very new:
   This would allow wiring up of objects that are referred to by ``id`` and
   provided elsewhere in the serialized data-structure, for example.
 
-So, lots to do! The amount of non-features currently outweighs the list of
-features, but I think Kylie is already useful.
+So, lots to do, but I think Kylie is already useful.
 
 
 Why is it called Kylie?
 -----------------------
 
-I named it `especially for you`_. Back in the late 80's (I'm old!) Kylie and
-Jason were today's Kim and Kanye. **This** Kylie works well with JSON. Geddit?
+Back in the late 80's (I'm old!) Kylie and Jason were today's Kim and Kanye.
+**This** Kylie works well with JSON. Geddit?
 
 .. image:: http://upload.wikimedia.org/wikipedia/en/1/1a/KylieEspeciallyForYouCover.png
 
-.. _especially for you: http://en.wikipedia.org/wiki/Especially_for_You
+.. _nested models: http://kylie.readthedocs.org/en/latest/usage.html#nested-models
+.. _type conversion: http://kylie.readthedocs.org/en/latest/usage.html#type-mapping
+.. _name mapping: http://kylie.readthedocs.org/en/latest/usage.html#name-mapping
+.. _MessagePack: http://msgpack.org/
