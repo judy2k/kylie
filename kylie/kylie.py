@@ -62,9 +62,6 @@ class Attribute(object):
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
 
-    def apply_model(self, attr_name):
-        self.attr_name = attr_name
-
     def unpack(self, instance, element):
         """
         Unpack the data item, provided as element, and store on the instance.
@@ -140,7 +137,7 @@ class MetaModel(type):
         model_attributes = []
         for attr_name, attr_instance in cls_dict.items():
             if isinstance(attr_instance, Attribute):
-                attr_instance.apply_model(attr_name)
+                attr_instance.attr_name = attr_name
 
                 model_attributes.append(attr_instance)
         # Remove the Attributes from the class to avoid accidental fallbacks

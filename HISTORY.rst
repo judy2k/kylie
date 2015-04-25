@@ -4,6 +4,14 @@
 History
 =======
 
+In Development
+--------------
+
+* Change to internal Attribute interface (will lead to minor version bump)
+
+  ``_apply_model`` has been replaced with a direct set of ``attr_name``.
+
+
 0.2.0 (2015-04-22)
 ------------------
 
