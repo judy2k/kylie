@@ -11,6 +11,9 @@ In Development
 
   ``_apply_model`` has been replaced with a direct set of ``attr_name``.
 
+* Minor code quality improvements.
+* Documentation improvements.
+
 
 0.2.0 (2015-04-22)
 ------------------
