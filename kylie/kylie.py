@@ -11,7 +11,10 @@ from __future__ import print_function
 
 
 def with_metaclass(meta, *bases):
-    """Create a base class with a metaclass."""
+    """
+    Create a base class with a metaclass.
+    """
+
     # This function was pasted from the `six` library.
     #
     # This requires a bit of explanation: the basic idea is to make a dummy
@@ -32,23 +35,23 @@ def identity(d):
 
 
 class Attribute(object):
+    """Used to define a persistent attribute on a Model subclass.
+
+    Args:
+        struct_name (str, optional): The dict key to be used when serializing
+            this attribute. Defaults to the name the attribute's name on its
+            host ``Model``.
+        python_type (function, optional): A function that takes the serialized
+            value and converts it to the type that will be stored on the
+            Model instance. This parameter is the usually used with, and is the
+            opposite of ``serialized_type``.
+
+        serialized_type (function, optional): A function that takes the
+            value stored on the Model instance and returns the value that
+            should be stored in the serialized dict. This parameter is the
+            usually used with, and is the opposite of ``python_type``.
     """
-    Define a persistent attribute on a Model subclass.
 
-    By default the attribute will use the attribute's name on the Model as the
-    key in the serialized dict. If ``struct_name`` is provided, that will be
-    used as the dict key.
-
-    ``python_type``, if provided should be a function that takes the serialized
-    value and converts it to the type that will be stored on the
-    Model instance. This parameter is the usually used with, and is the
-    opposite of ``serialized_type``.
-
-    ``serialized_type``, if provided, should be a function that takes the
-    value stored on the Model instance and returns a value that should be
-    stored in the serialized dict. This parameter is the usually used with, and
-    is the opposite of ``python_type``.
-    """
     def __init__(
             self,
             struct_name=None,
@@ -92,9 +95,20 @@ class Attribute(object):
 
 
 class Relation(Attribute):
+
+    """An Attribute that embeds to another Model.
+
+        Args:
+            relation_class (Model): The Model subclass that will be
+                deserialized into this attribute.
+            struct_name (str, optional): The name of the key that will be used
+                when serializing this attribute into a dict. Defaults to the
+                name of the attribute on the host Model.
+            sequence (bool, optional): Indicates that this attribute will store
+                a sequence of ``relation_class``, which will be serialized to a
+                list.
     """
-    An Attribute that links to another Model.
-    """
+
     def __init__(self, relation_class, struct_name=None, sequence=False):
         super(Relation, self).__init__(struct_name=struct_name)
         self.relation_class = relation_class
@@ -130,6 +144,7 @@ class MetaModel(type):
     """
     A metaclass to complete initialization of Attributes defined on a Model.
     """
+
     def __init__(cls, name, bases, cls_dict):
         super(MetaModel, cls).__init__(name, bases, cls_dict)
 
