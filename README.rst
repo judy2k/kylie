@@ -29,18 +29,20 @@ Features
 * Allows `type conversion`_ when serializing and de-serializing objects.
 * Automatic serialization/deserialization of `nested models`_.
 * Not bound to JSON in any way, and should also be useful for MessagePack_
-
+* Supports Python 2.6+ & 3.3+
 
 Example
 -------
 
-::
+.. code-block:: python
 
     class SpanishInquisitionModel(Model):
         inquisition_id = Attribute('id')
         expected = Attribute(python_type=bool, serialized_type=int)
 
-Then::
+Then:
+
+.. code-block:: pycon
 
     >>> surprise = SpanishInquisitionModel(inquisition_id=1234, expected=False)
     >>> surprise.inquisition_id
@@ -52,7 +54,9 @@ Note that the attribute ``inquisition_id`` becomes the dict key ``"id"``, and
 expected is mapped to ``0`` instead of ``False``.
 
 We can now take this dict, ``dumps`` it to JSON, and somewhere else call
-the following on the json_data (which is a dict returned from ``loads``)::
+the following on the json_data (which is a dict returned from ``loads``):
+
+.. code-block:: pycon
 
     >>> my_surprise = SpanishInquisitionModel.deserialize(json_data)
     >>> my_surprise.inquisition_id
