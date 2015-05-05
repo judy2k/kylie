@@ -163,7 +163,7 @@ class AttributeSwitcher(BaseModelSwitcher):
 
     def choose_model(self, element):
         if self.attribute_name in element:
-            return element.get(self.attribute_name)
+            return self.type_map[element.get(self.attribute_name)]
         else:
             raise DeserializationError("Missing {attr_name} key in ")
 
