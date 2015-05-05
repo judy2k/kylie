@@ -7,7 +7,10 @@ Tests for `kylie` module.
 
 import unittest
 
-from kylie import Model, Attribute, Relation
+from kylie import (
+    Model, Attribute, Relation, AttributeSwitcher,
+    DeserializationError,
+)
 
 
 def complex_unpack(d):
@@ -155,7 +158,7 @@ class PostSerializeTestCase(unittest.TestCase):
     def test_post_serialize(self):
         overwrite = OverwriteModel(item='item')
         d = overwrite.serialize()
-        self.assertEqual(d['item'],  'overwritten')
+        self.assertEqual(d['item'], 'overwritten')
 
 
 class TypedModel(Model):
@@ -171,11 +174,38 @@ class Cow(TypedModel):
 
 class Dog(TypedModel):
     model_type = 'dog'
+    wagging = Attribute()
+
+
+class PetOwner(Model):
+    cow_or_dog = Relation(AttributeSwitcher({
+        'cow': Cow,
+        'dog': Dog
+    }))
 
 
 class TypeSwitcherTestCase(unittest.TestCase):
     def test_basic_type_switching(self):
-        pass
+        pet_owner = PetOwner.deserialize({
+            'cow_or_dog': {'__type__': 'cow'}
+        })
+        self.assertTrue(isinstance(pet_owner.cow_or_dog, Cow))
+
+    def test_switch_loads_attributes_properly(self):
+        pet_owner = PetOwner.deserialize({
+            'cow_or_dog': {'__type__': 'dog', 'wagging': True}
+        })
+        self.assertTrue(isinstance(pet_owner.cow_or_dog, Dog))
+        self.assertTrue(pet_owner.cow_or_dog.wagging)
+
+    def test_no_type(self):
+        self.assertRaises(
+            DeserializationError,
+            lambda: PetOwner.deserialize(
+                {'cow_or_dog': {'missing_type': True}}
+            )
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
