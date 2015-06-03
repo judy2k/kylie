@@ -99,20 +99,19 @@ class Relation(Attribute):
     """An Attribute that embeds to another Model.
 
     Args:
-        relation_class (Model): The Model subclass that will be
-            deserialized into this attribute.
+        deserializable (Model, BaseModelChoice): The Model or BaseModelChoice
+            subclass that will be deserialized into this attribute.
         struct_name (str, optional): The name of the key that will be used
             when serializing this attribute into a dict. Defaults to the
             name of the attribute on the host Model.
         sequence (bool, optional): Indicates that this attribute will store
-            a sequence of ``relation_class``, which will be serialized to a
+            a sequence of ``deserializables``, which will be serialized to a
             list.
     """
 
-    def __init__(self, relation_class, struct_name=None, sequence=False):
+    def __init__(self, deserializable, struct_name=None, sequence=False):
         super(Relation, self).__init__(struct_name=struct_name)
-        # TODO: Rename relation_class and class_chooser
-        self.class_chooser = relation_class
+        self.deserializable = deserializable
         self.sequence = sequence
 
     def unpack(self, instance, value):
@@ -123,10 +122,10 @@ class Relation(Attribute):
         """
         if self.sequence:
             unpacked = [
-                self.class_chooser.deserialize(item) for item in value
+                self.deserializable.deserialize(item) for item in value
             ]
         else:
-            unpacked = self.class_chooser.deserialize(value)
+            unpacked = self.deserializable.deserialize(value)
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, d):
