@@ -184,7 +184,7 @@ class PetOwner(Model):
     }))
 
 
-class TypeSwitcherTestCase(unittest.TestCase):
+class MappedModelTestCase(unittest.TestCase):
     def test_basic_type_switching(self):
         pet_owner = PetOwner.deserialize({
             'cow_or_dog': {'__type__': 'cow'}

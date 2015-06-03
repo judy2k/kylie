@@ -33,6 +33,10 @@ def identity(d):
     return d
 
 
+class DeserializationError(Exception):
+    pass
+
+
 class Attribute(object):
 
     """Used to define a persistent attribute on a Model subclass.
@@ -65,9 +69,9 @@ class Attribute(object):
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
 
-    def unpack(self, instance, element):
+    def unpack(self, instance, value):
         """Unpack the data item and store on the instance."""
-        setattr(instance, self.attr_name, self.python_type_converter(element))
+        setattr(instance, self.attr_name, self.python_type_converter(value))
 
     def pack(self, instance, d):
         """Store the attribute on the provided dictionary, `d`."""
@@ -111,19 +115,18 @@ class Relation(Attribute):
         self.class_chooser = relation_class
         self.sequence = sequence
 
-    def unpack(self, instance, element):
+    def unpack(self, instance, value):
         """Unpack an embedded, serialized Model.
 
         Create a new instance of the `relation_class` and deserialize the
-        provided element into it.
+        provided value into it.
         """
-        # TODO: Rename element
         if self.sequence:
             unpacked = [
-                self.class_chooser.deserialize(item) for item in element
+                self.class_chooser.deserialize(item) for item in value
             ]
         else:
-            unpacked = self.class_chooser.deserialize(element)
+            unpacked = self.class_chooser.deserialize(value)
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, d):
@@ -138,22 +141,18 @@ class Relation(Attribute):
 
 
 class BaseModelChoice(object):
-    def choose_model(self, element):
+    def choose_model(self, value):
         """
-        Return a Model class suitable for deserializing the given `element`.
+        Return a Model class suitable for deserializing the given `value`.
         Params:
-            element: A data item.
+            value: A data item.
 
         Return: An object (or class, usually a Model) with a deserialize method
-            that can deserialize the given `element`
+            that can deserialize the given `value`
         """
 
-    def deserialize(self, element):
-        return self.choose_model(element).deserialize(element)
-
-
-class DeserializationError(Exception):
-    pass
+    def deserialize(self, value):
+        return self.choose_model(value).deserialize(value)
 
 
 class MappedModelChoice(BaseModelChoice):
@@ -164,14 +163,14 @@ class MappedModelChoice(BaseModelChoice):
         self.type_map = type_map
         self.attribute_name = attribute_name
 
-    def choose_model(self, element):
-        if self.attribute_name in element:
-            return self.type_map[element.get(self.attribute_name)]
+    def choose_model(self, value):
+        if self.attribute_name in value:
+            return self.type_map[value.get(self.attribute_name)]
         else:
             raise DeserializationError(
                 "Missing {attr_name} key in {record}".format(
                     attr_name=self.attribute_name,
-                    record=element,
+                    record=value,
                 ))
 
 
