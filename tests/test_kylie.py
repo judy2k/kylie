@@ -8,7 +8,7 @@ Tests for `kylie` module.
 import unittest
 
 from kylie import (
-    Model, Attribute, Relation, AttributeSwitcher,
+    Model, Attribute, Relation, MappedModelChoice,
     DeserializationError,
 )
 
@@ -178,7 +178,7 @@ class Dog(TypedModel):
 
 
 class PetOwner(Model):
-    cow_or_dog = Relation(AttributeSwitcher({
+    cow_or_dog = Relation(MappedModelChoice({
         'cow': Cow,
         'dog': Dog
     }))

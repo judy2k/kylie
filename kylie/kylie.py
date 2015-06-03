@@ -137,7 +137,7 @@ class Relation(Attribute):
             d[self.struct_name] = getattr(instance, self.attr_name).serialize()
 
 
-class BaseModelSwitcher(object):
+class BaseModelChoice(object):
     def choose_model(self, element):
         """
         Return a Model class suitable for deserializing the given `element`.
@@ -156,8 +156,11 @@ class DeserializationError(Exception):
     pass
 
 
-class AttributeSwitcher(BaseModelSwitcher):
+class MappedModelChoice(BaseModelChoice):
     def __init__(self, type_map, attribute_name='__type__'):
+        """
+        Used for Relation attributes which may map to one of a set of Models
+        """
         self.type_map = type_map
         self.attribute_name = attribute_name
 
@@ -165,7 +168,11 @@ class AttributeSwitcher(BaseModelSwitcher):
         if self.attribute_name in element:
             return self.type_map[element.get(self.attribute_name)]
         else:
-            raise DeserializationError("Missing {attr_name} key in ")
+            raise DeserializationError(
+                "Missing {attr_name} key in {record}".format(
+                    attr_name=self.attribute_name,
+                    record=element,
+                ))
 
 
 class MetaModel(type):

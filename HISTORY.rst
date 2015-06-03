@@ -7,6 +7,7 @@ History
 In Development
 --------------
 
+* MappedModelChoice
 * Change to internal Attribute interface (will lead to minor version bump)
 
   ``_apply_model`` has been replaced with a direct set of ``attr_name``.
