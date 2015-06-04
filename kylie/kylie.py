@@ -18,7 +18,7 @@ def with_metaclass(meta, *bases):
     class MetaClass(meta):
 
         """Indirection for the provided metaclass."""
-
+        # pylint: disable=unused-argument
         def __new__(cls, name, this_bases, attribs):
             return meta(name, bases, attribs)
 
