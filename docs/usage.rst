@@ -166,9 +166,67 @@ Now you can store and lists of Wheels with your car::
      <__main__.Wheel at 0x10306bb90>]
 
 
-<sup>*</sup> The `Reliant Robin`_ was a 3-wheeled car.
+* The `Reliant Robin`_ was a 3-wheeled car.
 
 .. _Reliant Robin: http://en.wikipedia.org/wiki/Reliant_Robin
+
+
+Type Choices
+------------
+
+Sometimes you need to determine the type of an input dictionary at runtime.
+Often the dictionary will contain a special attribute, called `type`,
+`__type__` or `class` (or something else) that tells the deserializer how to
+deserialize the dictionary into an object.
+
+Contrived Example
+~~~~~~~~~~~~~~~~~
+
+A `PetOwner` class contains a `pet` attribute that can either be an instance of
+`Cow` or an instance of `Dog`. The type is indicated by a '__type__' attribute
+on the serialized dictionary.
+::
+
+    class TypedModel(Model):
+        """
+        Models must be stored with an extra attribute for MappedModelChoice
+        to work.
+        """
+        model_type = None
+
+        def post_serialize(self, d):
+            d['__type__'] = self.model_type
+
+
+    class Cow(TypedModel):
+        model_type = 'cow'
+
+
+    class Dog(TypedModel):
+        model_type = 'dog'
+        wagging = Attribute()
+
+
+    class PetOwner(Model):
+        """ A class that either has a cow or a dog as a pet. """
+
+        # MappedModelChoice defaults to using the '__type__' attribute, and
+        # takes a map of __type__ value -> deserialization class.
+        pet = Relation(MappedModelChoice({
+            'cow': Cow,
+            'dog': Dog
+        }))
+
+Now you can deserialize the following::
+
+    data = {
+        'pet': {'__type__': 'dog', 'wagging': True}
+    }
+    pet_owner = PetOwner.deserialize(data)
+
+If you have more complex logic for choosing a class for deserialization, you
+can extend `BaseModelChoice` and implement the `choose_model` method.
+
 
 What else should I know?
 ------------------------

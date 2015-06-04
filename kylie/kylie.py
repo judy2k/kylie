@@ -2,8 +2,7 @@
 
 """Internal implementation of the `kylie` package.
 
-You probably want to use the `kylie` package directly, instead of this on, as
-that is the public interface.
+You probably want to use the `kylie` package directly, instead of this.
 """
 
 from __future__ import print_function
@@ -19,19 +18,26 @@ def with_metaclass(meta, *bases):
     class MetaClass(meta):
 
         """Indirection for the provided metaclass."""
-
-        def __new__(cls, name, this_bases, d):
-            return meta(name, bases, d)
+        # pylint: disable=unused-argument
+        def __new__(cls, name, this_bases, attribs):
+            return meta(name, bases, attribs)
 
     return type.__new__(MetaClass, 'temporary_class', (), {})
 
 
-def identity(d):
+def identity(value):
     """The identity function.
 
     Because functional programmers hate `if` statements.
     """
-    return d
+    return value
+
+
+class DeserializationError(Exception):
+
+    """Error indicating deserialization failed."""
+
+    pass
 
 
 class Attribute(object):
@@ -46,7 +52,6 @@ class Attribute(object):
             value and converts it to the type that will be stored on the
             Model instance. This parameter is the usually used with, and is the
             opposite of ``serialized_type``.
-
         serialized_type (function, optional): A function that takes the
             value stored on the Model instance and returns the value that
             should be stored in the serialized dict. This parameter is the
@@ -66,14 +71,14 @@ class Attribute(object):
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
 
-    def unpack(self, instance, element):
+    def unpack(self, instance, value):
         """Unpack the data item and store on the instance."""
-        setattr(instance, self.attr_name, self.python_type_converter(element))
+        setattr(instance, self.attr_name, self.python_type_converter(value))
 
-    def pack(self, instance, d):
-        """Store the attribute on the provided dictionary, `d`."""
+    def pack(self, instance, record):
+        """Store the attribute on the provided dictionary, `record`."""
         attr_value = getattr(instance, self.attr_name)
-        d[self.struct_name] = self.serialized_type_converter(attr_value)
+        record[self.struct_name] = self.serialized_type_converter(attr_value)
 
     @property
     def struct_name(self):
@@ -95,45 +100,118 @@ class Relation(Attribute):
 
     """An Attribute that embeds to another Model.
 
-    Args:
-        relation_class (Model): The Model subclass that will be
-            deserialized into this attribute.
+    Params:
+        deserializable (Model, BaseModelChoice): The Model or BaseModelChoice
+            subclass that will be deserialized into this attribute.
         struct_name (str, optional): The name of the key that will be used
             when serializing this attribute into a dict. Defaults to the
             name of the attribute on the host Model.
         sequence (bool, optional): Indicates that this attribute will store
-            a sequence of ``relation_class``, which will be serialized to a
+            a sequence of ``deserializables``, which will be serialized to a
             list.
     """
 
-    def __init__(self, relation_class, struct_name=None, sequence=False):
+    def __init__(self, deserializable, struct_name=None, sequence=False):
         super(Relation, self).__init__(struct_name=struct_name)
-        self.relation_class = relation_class
+        self.deserializable = deserializable
         self.sequence = sequence
 
-    def unpack(self, instance, element):
+    def unpack(self, instance, value):
         """Unpack an embedded, serialized Model.
 
         Create a new instance of the `relation_class` and deserialize the
-        provided element into it.
+        provided value into it.
         """
         if self.sequence:
             unpacked = [
-                self.relation_class.deserialize(item) for item in element
+                self.deserializable.deserialize(item) for item in value
             ]
         else:
-            unpacked = self.relation_class.deserialize(element)
+            unpacked = self.deserializable.deserialize(value)
         setattr(instance, self.attr_name, unpacked)
 
-    def pack(self, instance, d):
-        """Serialize the provided `instance` into the provided dict `d`."""
+    def pack(self, instance, record):
+        """Serialize the provided `instance` into the provided dict `record`."""
         if self.sequence:
             model_seq = getattr(instance, self.attr_name)
-            d[self.struct_name] = [
+            serialized = [
                 model.serialize() for model in model_seq
             ]
         else:
-            d[self.struct_name] = getattr(instance, self.attr_name).serialize()
+            serialized = getattr(instance, self.attr_name).serialize()
+        record[self.struct_name] = serialized
+
+
+class BaseModelChoice(object):
+
+    """
+    Abstract class for providing Model class choice on deserialization.
+
+    If records contain an attribute that specify the class of the serialized
+    object, then you should probably use ``MappedModelChoice`` instead.
+    If your logic is more complex then subclass ``BaseModelChoice`` and
+    and implement ``choose_model``.
+
+    Instances of BaseModelChoice can be passed to the ``Attribute`` constructor
+    in place of a Model class.
+    """
+
+    def choose_model(self, value):
+        """
+        Return a Model class suitable for deserializing the given `value`.
+
+        Params:
+            value: A data item.
+
+        Return: An object (or class, usually a Model) with a deserialize method
+            that can deserialize the given `value`
+        """
+        raise NotImplementedError('Concrete subclasses of BaseModelChoice must'
+                                  ' implement choose_model.')
+
+    def deserialize(self, value):
+        """Deserialize ``value`` into a dynamically chosen ``Model``.
+
+        The chosen Model is specified by the abstract method ``choose_model``.
+        """
+        return self.choose_model(value).deserialize(value)
+
+
+class MappedModelChoice(BaseModelChoice):
+    def __init__(self, type_map, attribute_name='__type__'):
+        """
+        Used for Relation attributes which may map to one of a set of Models.
+
+        Params:
+            type_map (dict): A dictionary keyed with possible values of the
+                special attribute, stored against the associated Model class.
+            attribute_name (str, optional): The name of the special attribute
+                that is used to determine the Model that should be chosen for
+                deserialization.
+        """
+        self.type_map = type_map
+        self.attribute_name = attribute_name
+
+    def choose_model(self, value):
+        """Choose a ``Model`` for deserialization.
+
+        This implementation chooses a Model based on the value of the
+        attribute specified by the ``attribute_name`` this
+        ``MappedModelChoice`` was instantiated with. The value of this
+        attribute is looked up in this instance's ``type_map`` and the
+        resulting ``Model`` class is returned.
+
+        If the value of the special attribute is not found in ``type_map``,
+        a ``DeserializationError`` is raised.
+        """
+        if self.attribute_name in value:
+            return self.type_map[value.get(self.attribute_name)]
+        else:
+            raise DeserializationError(
+                "Missing {attr_name} key in {record}".format(
+                    attr_name=self.attribute_name,
+                    record=value,
+                ))
 
 
 class MetaModel(type):
@@ -185,16 +263,20 @@ class Model(with_metaclass(MetaModel, object)):
             setattr(self, attr_name, value)
 
     @classmethod
-    def deserialize(cls, d):
+    def deserialize(cls, record):
         """Extract the data from a dict into this Model instance."""
         result = cls()
         for attr in cls._model_attributes:
-            attr.unpack(result, d[attr.struct_name])
+            attr.unpack(result, record[attr.struct_name])
         return result
 
     def serialize(self):
         """Extract this model's Attributes into a dict."""
-        d = {}
+        record = {}
         for attr in self._model_attributes:
-            attr.pack(self, d)
-        return d
+            attr.pack(self, record)
+
+        if hasattr(self, 'post_serialize'):
+            self.post_serialize(record)
+
+        return record

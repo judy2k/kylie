@@ -7,7 +7,10 @@ Tests for `kylie` module.
 
 import unittest
 
-from kylie import Model, Attribute, Relation
+from kylie import (
+    Model, Attribute, BaseModelChoice, Relation, MappedModelChoice,
+    DeserializationError,
+)
 
 
 def complex_unpack(d):
@@ -42,7 +45,7 @@ class BobModel(Model):
     people = Relation(PersonModel, sequence=True)
 
 
-class TestDeserialization(unittest.TestCase):
+class DeserializationTestCase(unittest.TestCase):
     def setUp(self):
         self.data = {
             'id': 123456,
@@ -86,7 +89,7 @@ class TestDeserialization(unittest.TestCase):
         self.assertEqual(self.bob.null, None)
 
 
-class TestConstruction(unittest.TestCase):
+class ConstructionTestCase(unittest.TestCase):
     def test_empty_init(self):
         inquisition = SpanishInquisitionModel()
         self.assertEqual(inquisition.inquisition_id, None)
@@ -102,7 +105,7 @@ class TestConstruction(unittest.TestCase):
         self.assertEqual(inquisition.expected, False)
 
 
-class TestSerialization(unittest.TestCase):
+class SerializationTestCase(unittest.TestCase):
     def setUp(self):
         inquisition = SpanishInquisitionModel(
             inquisition_id=10, expected=False)
@@ -142,6 +145,79 @@ class TestSerialization(unittest.TestCase):
 
     def test_null_value(self):
         self.assertEqual(self.data['null'], None)
+
+
+class OverwriteModel(Model):
+    item = Attribute()
+
+    def post_serialize(self, d):
+        d['item'] = 'overwritten'
+
+
+class PostSerializeTestCase(unittest.TestCase):
+    def test_post_serialize(self):
+        overwrite = OverwriteModel(item='item')
+        d = overwrite.serialize()
+        self.assertEqual(d['item'], 'overwritten')
+
+
+class TypedModel(Model):
+    model_type = None
+
+    def post_serialize(self, d):
+        d['__type__'] = self.model_type
+
+
+class Cow(TypedModel):
+    model_type = 'cow'
+
+
+class Dog(TypedModel):
+    model_type = 'dog'
+    wagging = Attribute()
+
+
+class PetOwner(Model):
+    cow_or_dog = Relation(MappedModelChoice({
+        'cow': Cow,
+        'dog': Dog
+    }))
+
+
+class BaseModelChoiceTestCase(unittest.TestCase):
+    def test_choose_model_is_abstract(self):
+        """
+        BaseModelChoice.choose_model should raise NotImplementedError
+        """
+        choice = BaseModelChoice()
+
+        self.assertRaises(
+            NotImplementedError,
+            lambda: choice.choose_model('anything')
+        )
+
+
+class MappedModelTestCase(unittest.TestCase):
+    def test_basic_type_switching(self):
+        pet_owner = PetOwner.deserialize({
+            'cow_or_dog': {'__type__': 'cow'}
+        })
+        self.assertTrue(isinstance(pet_owner.cow_or_dog, Cow))
+
+    def test_switch_loads_attributes_properly(self):
+        pet_owner = PetOwner.deserialize({
+            'cow_or_dog': {'__type__': 'dog', 'wagging': True}
+        })
+        self.assertTrue(isinstance(pet_owner.cow_or_dog, Dog))
+        self.assertTrue(pet_owner.cow_or_dog.wagging)
+
+    def test_no_type(self):
+        self.assertRaises(
+            DeserializationError,
+            lambda: PetOwner.deserialize(
+                {'cow_or_dog': {'missing_type': True}}
+            )
+        )
 
 
 if __name__ == '__main__':
