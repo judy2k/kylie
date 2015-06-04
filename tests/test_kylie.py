@@ -8,7 +8,7 @@ Tests for `kylie` module.
 import unittest
 
 from kylie import (
-    Model, Attribute, Relation, MappedModelChoice,
+    Model, Attribute, BaseModelChoice, Relation, MappedModelChoice,
     DeserializationError,
 )
 
@@ -182,6 +182,19 @@ class PetOwner(Model):
         'cow': Cow,
         'dog': Dog
     }))
+
+
+class BaseModelChoiceTestCase(unittest.TestCase):
+    def test_choose_model_is_abstract(self):
+        """
+        BaseModelChoice.choose_model should raise NotImplementedError
+        """
+        choice = BaseModelChoice()
+
+        self.assertRaises(
+            NotImplementedError,
+            lambda: choice.choose_model('anything')
+        )
 
 
 class MappedModelTestCase(unittest.TestCase):
