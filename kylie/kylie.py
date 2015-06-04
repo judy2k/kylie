@@ -149,6 +149,8 @@ class BaseModelChoice(object):
         Return: An object (or class, usually a Model) with a deserialize method
             that can deserialize the given `value`
         """
+        raise NotImplementedError('Concrete subclasses of BaseModelChoice must'
+                                  ' implement choose_model.')
 
     def deserialize(self, value):
         return self.choose_model(value).deserialize(value)
