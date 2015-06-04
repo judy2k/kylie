@@ -4,6 +4,7 @@
 
 __all__ = (
     'Attribute',
+    'BaseModelChoice',
     'DeserializationError',
     'MappedModelChoice',
     'Model',
@@ -16,6 +17,7 @@ __version__ = '0.2.0'
 
 from .kylie import (
     Attribute,
+    BaseModelChoice,
     DeserializationError,
     MappedModelChoice,
     Model,
