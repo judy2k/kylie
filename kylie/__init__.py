@@ -2,6 +2,15 @@
 
 """kylie - A module for mapping between JSON and Python classes."""
 
+from .kylie import (
+    Attribute,
+    BaseModelChoice,
+    DeserializationError,
+    MappedModelChoice,
+    Model,
+    Relation,
+)
+
 __all__ = (
     'Attribute',
     'BaseModelChoice',
@@ -14,12 +23,3 @@ __all__ = (
 __author__ = 'Mark Smith'
 __email__ = 'mark.smith@practicalpoetry.co.uk'
 __version__ = '0.2.0'
-
-from .kylie import (
-    Attribute,
-    BaseModelChoice,
-    DeserializationError,
-    MappedModelChoice,
-    Model,
-    Relation,
-)
