@@ -4,10 +4,11 @@
 History
 =======
 
-In Development
---------------
+0.3.0 (2015-06-05)
+------------------
 
-* MappedModelChoice
+* MappedModelChoice & BaseModelChoice for determining Model to deserialize
+  at runtime.
 * Change to internal Attribute interface (will lead to minor version bump)
 
   ``_apply_model`` has been replaced with a direct set of ``attr_name``.
