@@ -31,6 +31,7 @@ Features
 * Not bound to JSON in any way, and should also be useful for MessagePack_
 * Supports Python 2.6+ & 3.3+
 
+
 Example
 -------
 
@@ -77,16 +78,11 @@ very new:
 
 * Doesn't have any mechanism for validation. I plan to add this once I
   decide the best way to do it. *Ideas welcome!*
-* Doesn't have any built-in mechanism for choosing between different types to
-  deserialize a dict to. This can be done through customized type mapper
-  functions. At the very least, I'll document this soon. I plan to add the
-  ability to automatically deserialize to a type based on, for example, a
-  ``__type__`` item in the dict.
-* No post-serialize or post-deserialize options, unless you do it yourself.
+* No post-deserialize option, unless you do it yourself.
   This would allow wiring up of objects that are referred to by ``id`` and
   provided elsewhere in the serialized data-structure, for example.
 
-So, lots to do, but I think Kylie is already useful.
+So, still some important things to do, but I think Kylie is already useful.
 
 
 Why is it called Kylie?
