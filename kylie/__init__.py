@@ -22,4 +22,4 @@ __all__ = (
 
 __author__ = 'Mark Smith'
 __email__ = 'mark.smith@practicalpoetry.co.uk'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
