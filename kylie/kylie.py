@@ -187,6 +187,10 @@ class BaseModelChoice(object):
 
 
 class MappedModelChoice(BaseModelChoice):
+    """
+    Used for Relation attributes which may map to one of a set of Models.
+    """
+
     def __init__(self, type_map, attribute_name='__type__'):
         """
         Used for Relation attributes which may map to one of a set of Models.
@@ -277,7 +281,6 @@ class Model(with_metaclass(MetaModel, object)):
         if record is not None:
             result = cls()
             for attr in cls._model_attributes:
-                print(attr.struct_name, attr.optional)
                 if attr.optional:
                     attr.unpack(result, record.get(attr.struct_name, None))
                 else:
