@@ -117,7 +117,7 @@ class MissingAttributeDeserializationTestCase(unittest.TestCase):
         }
 
         bob = BobModel.deserialize(data)
-        self.assertIsNone(bob.entry_fee)
+        self.assertTrue(bob.entry_fee is None)
 
     def test_missing_inquisition(self):
         """
@@ -144,7 +144,7 @@ class MissingAttributeDeserializationTestCase(unittest.TestCase):
         }
 
         bob = BobModel.deserialize(data)
-        self.assertIsNone(bob.spanish_inquisition)
+        self.assertTrue(bob.spanish_inquisition is None)
 
     def test_serialize_none_relation(self):
         """
@@ -172,7 +172,7 @@ class MissingAttributeDeserializationTestCase(unittest.TestCase):
 
         bob = BobModel.deserialize(data)
         data = bob.serialize()
-        self.assertIsNone(data['spanishInquisition'])
+        self.assertTrue(data['spanishInquisition'] is None)
 
 
 class ConstructionTestCase(unittest.TestCase):
