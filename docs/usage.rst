@@ -107,6 +107,36 @@ Now you can do the following::
     datetime.datetime(2015, 4, 12, 20, 21, 11, 656000)
 
 
+.. _optional_attributes:
+
+Optional Attributes
+-------------------
+
+When deserializing, if an Attribute is *missing* from the source dictionary,
+then Kylie will raise a ``KeyError``. Sometimes, though, we want to be able to
+deserialize from data where missing data is *missing*, and not just ``None``.
+
+Set the Attribute's ``optional`` parameter to ``True``, and then the attribute's
+value will be set to None if it is missing from the source data. Note that if
+you then serialize this attribute again, it will be stored as ``None``, and won't
+be missing in the output::
+
+    class MaybeEmpty(Model):
+        can_be_missing = Attribute(optional=True)
+
+
+Will allow the following::
+
+    >>> empty = MaybeEmpty.deserialize({})
+    >>> empty.can_be_missing
+    None
+
+    >>> not_empty = MaybeEmpty.deserialize({
+    ...     'can_be_missing': 'Not Missing!'
+    ... })
+    >>> not_empty.can_be_missing
+    'Not Missing!'
+
 
 .. _nested models:
 
@@ -233,10 +263,6 @@ What else should I know?
 
 If a value in the input dict is ``None``, it will be set to ``None`` in the
 deserialized object. There's no way to ensure a value is non-None.
-
-If an attribute is missing from the input dict, ``deserialize`` will fail with
-an exception. There is currently no way to flag an attribute as 'possibly
-missing'. It's on the list.
 
 Currently, Kylie doesn't do any validation of anything. If you get an exception
 that seems like a bad fit, please raise an issue on GitHub.

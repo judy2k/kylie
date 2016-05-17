@@ -56,6 +56,9 @@ class Attribute(object):
             value stored on the Model instance and returns the value that
             should be stored in the serialized dict. This parameter is the
             usually used with, and is the opposite of ``python_type``.
+        optional (bool, optional): A bool that specifies if an exception should
+            be raised if the key is missing from the dict when deserializing.
+            Defaults to `False`
     """
 
     def __init__(
