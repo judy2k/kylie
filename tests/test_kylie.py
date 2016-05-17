@@ -40,7 +40,7 @@ class BobModel(Model):
     complex_type = Attribute(python_type=complex_unpack,
                              serialized_type=complex_pack)
     spanish_inquisition = Relation(
-        SpanishInquisitionModel, 'spanishInquisition')
+        SpanishInquisitionModel, 'spanishInquisition', optional=True)
     null = Attribute()
     people = Relation(PersonModel, sequence=True)
 
@@ -90,8 +90,11 @@ class DeserializationTestCase(unittest.TestCase):
 
 
 class MissingAttributeDeserializationTestCase(unittest.TestCase):
-    def setUp(self):
-        self.data = {
+    def test_missing_entry_fee(self):
+        """
+        Deserializing an optional Attribute results in None
+        """
+        data = {
             'id': 123456,
             # 'entry_fee': 12, -- Removed to test optional attributes.
             'is_happy': 0,
@@ -113,9 +116,63 @@ class MissingAttributeDeserializationTestCase(unittest.TestCase):
             'null': None,
         }
 
-    def test_missing_entry_fee(self):
-        bob = BobModel.deserialize(self.data)
+        bob = BobModel.deserialize(data)
         self.assertIsNone(bob.entry_fee)
+
+    def test_missing_inquisition(self):
+        """
+        Deserializing an optional Relation results in None
+        """
+        data = {
+            'id': 123456,
+            'entry_fee': 12,
+            'is_happy': 0,
+            # -- Missing spanishInquisition
+            'complex_type': {
+                'real': 2,
+                'imaginary': 1,
+            },
+            'people': [
+                {
+                    'name': 'Alice'
+                },
+                {
+                    'name': 'Sue'
+                }
+            ],
+            'null': None,
+        }
+
+        bob = BobModel.deserialize(data)
+        self.assertIsNone(bob.spanish_inquisition)
+
+    def test_serialize_none_relation(self):
+        """
+        Serializing a Relation where optional is True and the value is None, results in None
+        """
+        data = {
+            'id': 123456,
+            'entry_fee': 12,
+            'is_happy': 0,
+            # -- Missing spanishInquisition
+            'complex_type': {
+                'real': 2,
+                'imaginary': 1,
+            },
+            'people': [
+                {
+                    'name': 'Alice'
+                },
+                {
+                    'name': 'Sue'
+                }
+            ],
+            'null': None,
+        }
+
+        bob = BobModel.deserialize(data)
+        data = bob.serialize()
+        self.assertIsNone(data['spanishInquisition'])
 
 
 class ConstructionTestCase(unittest.TestCase):

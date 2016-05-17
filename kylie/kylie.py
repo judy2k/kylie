@@ -143,7 +143,11 @@ class Relation(Attribute):
                 model.serialize() for model in model_seq
             ]
         else:
-            serialized = getattr(instance, self.attr_name).serialize()
+            value = getattr(instance, self.attr_name)
+            if value is not None:
+                serialized = value.serialize()
+            else:
+                serialized = None
         record[self.struct_name] = serialized
 
 
@@ -270,12 +274,16 @@ class Model(with_metaclass(MetaModel, object)):
     @classmethod
     def deserialize(cls, record):
         """Extract the data from a dict into this Model instance."""
-        result = cls()
-        for attr in cls._model_attributes:
-            if attr.optional:
-                attr.unpack(result, record.get(attr.struct_name, None))
-            else:
-                attr.unpack(result, record[attr.struct_name])
+        if record is not None:
+            result = cls()
+            for attr in cls._model_attributes:
+                print(attr.struct_name, attr.optional)
+                if attr.optional:
+                    attr.unpack(result, record.get(attr.struct_name, None))
+                else:
+                    attr.unpack(result, record[attr.struct_name])
+        else:
+            result = None
         return result
 
     def serialize(self):
