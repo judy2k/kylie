@@ -35,7 +35,7 @@ class PersonModel(Model):
 
 class BobModel(Model):
     bob_id = Attribute("id")
-    entry_fee = Attribute()
+    entry_fee = Attribute(optional=True)
     is_happy = Attribute(python_type=bool, serialized_type=int)
     complex_type = Attribute(python_type=complex_unpack,
                              serialized_type=complex_pack)
@@ -87,6 +87,35 @@ class DeserializationTestCase(unittest.TestCase):
 
     def test_null_value(self):
         self.assertEqual(self.bob.null, None)
+
+
+class MissingAttributeDeserializationTestCase(unittest.TestCase):
+    def setUp(self):
+        self.data = {
+            'id': 123456,
+            # 'entry_fee': 12, -- Removed to test optional attributes.
+            'is_happy': 0,
+            'spanishInquisition': {
+                'expected': 1, 'id': 5678
+            },
+            'complex_type': {
+                'real': 2,
+                'imaginary': 1,
+            },
+            'people': [
+                {
+                    'name': 'Alice'
+                },
+                {
+                    'name': 'Sue'
+                }
+            ],
+            'null': None,
+        }
+
+    def test_missing_entry_fee(self):
+        bob = BobModel.deserialize(self.data)
+        self.assertIsNone(bob.entry_fee)
 
 
 class ConstructionTestCase(unittest.TestCase):

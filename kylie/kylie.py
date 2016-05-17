@@ -63,6 +63,7 @@ class Attribute(object):
             struct_name=None,
             python_type=None,
             serialized_type=None,
+            optional=False,
     ):
         self._struct_name = struct_name
         # Set by metaclass:
@@ -70,6 +71,7 @@ class Attribute(object):
         self.python_type_converter = python_type if python_type else identity
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
+        self.optional = optional
 
     def unpack(self, instance, value):
         """Unpack the data item and store on the instance."""
@@ -111,8 +113,8 @@ class Relation(Attribute):
             list.
     """
 
-    def __init__(self, deserializable, struct_name=None, sequence=False):
-        super(Relation, self).__init__(struct_name=struct_name)
+    def __init__(self, deserializable, struct_name=None, sequence=False, optional=False):
+        super(Relation, self).__init__(struct_name=struct_name, optional=optional)
         self.deserializable = deserializable
         self.sequence = sequence
 
@@ -267,7 +269,10 @@ class Model(with_metaclass(MetaModel, object)):
         """Extract the data from a dict into this Model instance."""
         result = cls()
         for attr in cls._model_attributes:
-            attr.unpack(result, record[attr.struct_name])
+            if attr.optional:
+                attr.unpack(result, record.get(attr.struct_name, None))
+            else:
+                attr.unpack(result, record[attr.struct_name])
         return result
 
     def serialize(self):
