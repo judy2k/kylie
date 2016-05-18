@@ -91,7 +91,7 @@ class DeserializationTestCase(unittest.TestCase):
 
 class MissingAttributeDeserializationTestCase(unittest.TestCase):
     """
-    Tests related to serialization/deserialization of optional Attributes and Relations.
+    Test serialization/deserialization of optional Attributes and Relations
     """
 
     def test_missing_entry_fee(self):
@@ -152,7 +152,7 @@ class MissingAttributeDeserializationTestCase(unittest.TestCase):
 
     def test_serialize_none_relation(self):
         """
-        Serializing a Relation where optional is True and the value is None, results in None
+        Serialize a Relation where optional is True and the value is None
         """
         data = {
             'id': 123456,

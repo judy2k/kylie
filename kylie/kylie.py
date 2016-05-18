@@ -116,8 +116,12 @@ class Relation(Attribute):
             list.
     """
 
-    def __init__(self, deserializable, struct_name=None, sequence=False, optional=False):
-        super(Relation, self).__init__(struct_name=struct_name, optional=optional)
+    def __init__(
+        self, deserializable, struct_name=None, sequence=False, optional=False
+    ):
+        super(Relation, self).__init__(
+            struct_name=struct_name, optional=optional
+        )
         self.deserializable = deserializable
         self.sequence = sequence
 
@@ -136,7 +140,9 @@ class Relation(Attribute):
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, record):
-        """Serialize the provided `instance` into the provided dict `record`."""
+        """
+        Serialize the provided `instance` into the provided dict `record`.
+        """
         if self.sequence:
             model_seq = getattr(instance, self.attr_name)
             serialized = [
