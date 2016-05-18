@@ -90,6 +90,10 @@ class DeserializationTestCase(unittest.TestCase):
 
 
 class MissingAttributeDeserializationTestCase(unittest.TestCase):
+    """
+    Tests related to serialization/deserialization of optional Attributes and Relations.
+    """
+
     def test_missing_entry_fee(self):
         """
         Deserializing an optional Attribute results in None

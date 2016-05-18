@@ -187,6 +187,7 @@ class BaseModelChoice(object):
 
 
 class MappedModelChoice(BaseModelChoice):
+
     """
     Used for Relation attributes which may map to one of a set of Models.
     """
@@ -282,7 +283,7 @@ class Model(with_metaclass(MetaModel, object)):
             result = cls()
             for attr in cls._model_attributes:
                 if attr.optional:
-                    attr.unpack(result, record.get(attr.struct_name, None))
+                    attr.unpack(result, record.get(attr.struct_name))
                 else:
                     attr.unpack(result, record[attr.struct_name])
         else:
