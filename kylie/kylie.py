@@ -56,6 +56,9 @@ class Attribute(object):
             value stored on the Model instance and returns the value that
             should be stored in the serialized dict. This parameter is the
             usually used with, and is the opposite of ``python_type``.
+        optional (bool, optional): A bool that specifies if an exception should
+            be raised if the key is missing from the dict when deserializing.
+            Defaults to `False`
     """
 
     def __init__(
@@ -63,6 +66,7 @@ class Attribute(object):
             struct_name=None,
             python_type=None,
             serialized_type=None,
+            optional=False,
     ):
         self._struct_name = struct_name
         # Set by metaclass:
@@ -70,6 +74,7 @@ class Attribute(object):
         self.python_type_converter = python_type if python_type else identity
         self.serialized_type_converter = \
             serialized_type if serialized_type else identity
+        self.optional = optional
 
     def unpack(self, instance, value):
         """Unpack the data item and store on the instance."""
@@ -111,8 +116,12 @@ class Relation(Attribute):
             list.
     """
 
-    def __init__(self, deserializable, struct_name=None, sequence=False):
-        super(Relation, self).__init__(struct_name=struct_name)
+    def __init__(
+        self, deserializable, struct_name=None, sequence=False, optional=False
+    ):
+        super(Relation, self).__init__(
+            struct_name=struct_name, optional=optional
+        )
         self.deserializable = deserializable
         self.sequence = sequence
 
@@ -131,14 +140,20 @@ class Relation(Attribute):
         setattr(instance, self.attr_name, unpacked)
 
     def pack(self, instance, record):
-        """Serialize the provided `instance` into the provided dict `record`."""
+        """
+        Serialize the provided `instance` into the provided dict `record`.
+        """
         if self.sequence:
             model_seq = getattr(instance, self.attr_name)
             serialized = [
                 model.serialize() for model in model_seq
             ]
         else:
-            serialized = getattr(instance, self.attr_name).serialize()
+            value = getattr(instance, self.attr_name)
+            if value is not None:
+                serialized = value.serialize()
+            else:
+                serialized = None
         record[self.struct_name] = serialized
 
 
@@ -178,6 +193,11 @@ class BaseModelChoice(object):
 
 
 class MappedModelChoice(BaseModelChoice):
+
+    """
+    Used for Relation attributes which may map to one of a set of Models.
+    """
+
     def __init__(self, type_map, attribute_name='__type__'):
         """
         Used for Relation attributes which may map to one of a set of Models.
@@ -265,9 +285,15 @@ class Model(with_metaclass(MetaModel, object)):
     @classmethod
     def deserialize(cls, record):
         """Extract the data from a dict into this Model instance."""
-        result = cls()
-        for attr in cls._model_attributes:
-            attr.unpack(result, record[attr.struct_name])
+        if record is not None:
+            result = cls()
+            for attr in cls._model_attributes:
+                if attr.optional:
+                    attr.unpack(result, record.get(attr.struct_name))
+                else:
+                    attr.unpack(result, record[attr.struct_name])
+        else:
+            result = None
         return result
 
     def serialize(self):

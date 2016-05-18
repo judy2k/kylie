@@ -4,6 +4,12 @@
 History
 =======
 
+In Development
+--------------
+
+* Add ``optional`` parameter to Attribute and Relation to allow missing values.
+
+
 0.3.0 (2015-06-05)
 ------------------
 
@@ -21,6 +27,7 @@ History
 ------------------
 
 * Added list support to Relation with ``sequence=True`` parameter.
+
 
 0.1.1 (2015-04-12)
 ------------------
